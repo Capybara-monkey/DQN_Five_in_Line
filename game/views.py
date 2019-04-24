@@ -10,8 +10,8 @@ class GameView(View):
         table = Table.objects.get(data_id=1).tb
         table = json.loads(table)
         self.params = {}
-        for i in range(9):
-            self.params["b"+str(i)] = table[i]
+        """数字->○×の変換"""
+        self.num_to_symbol(table)
         return render(request, "game/game.html", self.params)
 
     def post(self, request):
@@ -24,8 +24,8 @@ class GameView(View):
             table = [0, 0, 0, 0, 0, 0, 0, 0, 0]
             data.tb = json.dumps(table)
             data.save()
-            for i in range(9):
-                self.params["b"+str(i)] = table[i]
+            """数字->○×の変換"""
+            self.num_to_symbol(table)
             return render(request, "game/game.html", self.params)
 
         """ユーザーの入力を反映させる。"""
@@ -33,16 +33,31 @@ class GameView(View):
             self.params["b"+str(i)] = table[i]
         for i in range(9):
             if "b"+ str(i) in request.POST:
-                if not table[i] == 0:
+                if not table[i] == 0:  #既に選択されているマスの場合
+                    self.num_to_symbol(table)
                     return render(request, "game/game.html", self.params)
                 table[i] = 1
                 self.params["b"+str(i)] = 1
 
+        """ユーザーの勝利判定"""
         if self.check_win(1, table):
-            self.params["result"] = "win"
+            self.params["result"] = "Win"
             data.tb = json.dumps(table)
             data.save()
+            """数字->○×の変換"""
+            self.num_to_symbol(table)
             return render(request, "game/game.html", self.params)
+
+        """引き分け判定"""
+        if self.check_draw(table):
+            self.params["result"] = "Draw"
+            data.tb = json.dumps(table)
+            data.save()
+            """数字->○×の変換"""
+            self.num_to_symbol(table)
+            return render(request, "game/game.html", self.params)
+
+
 
         """CPUの入力を反映させる。"""
         while True:
@@ -54,11 +69,12 @@ class GameView(View):
         self.params["b"+str(action)] = -1
 
         if self.check_win(-1, table):
-            self.params["result"] = "lose"
+            self.params["result"] = "Lose"
 
         data.tb = json.dumps(table)
         data.save()
 
+        self.num_to_symbol(table)
         return render(request, "game/game.html", self.params)
 
     def check_win(self, user, table):
@@ -74,3 +90,20 @@ class GameView(View):
             return True
 
         return False
+
+    def check_draw(self, table):
+        """全てのマスが埋まっているかを判定"""
+        for i in range(9):
+            if table[i] == 0:
+                return False
+        return True
+
+    def num_to_symbol(self, table):
+        """render用にtableの数字を記号に変換"""
+        for i in range(9):
+            if table[i] == 0:
+                self.params["b"+str(i)] = " "
+            elif table[i] == 1:
+                self.params["b"+str(i)] = "○"
+            else:
+                self.params["b"+str(i)] = "×"
