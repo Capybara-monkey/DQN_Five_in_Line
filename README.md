@@ -14,8 +14,8 @@
 ![ホーム](https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/home.png)
 
 #### プレイ中画面
-![playing] (https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/playing.png)
+![playing](https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/playing.png)
 
 #### 結果画面
-![result] (https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/result.png)
+![result](https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/result.png)
 
