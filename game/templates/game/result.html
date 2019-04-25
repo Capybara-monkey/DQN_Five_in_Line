@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+button {
+width:50px;
+height:50px;
+}
+</style>
+{% endblock %}
+
+{% block title %}AI五目並べ{% endblock title %}
+
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="">AI五目並べ</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+
+<div class="container" style="padding:30px 0 0 0">
+    <div class="jumbotron bg-white">
+        <h1>{{result}}</h1>
+        <center>
+            <table>
+                <tr>
+                    <td><button name="b0">{{ b0 }}</button></td>
+                    <td><button name="b1">{{ b1 }}</button></td>
+                    <td><button name="b2">{{ b2 }}</button></td>
+                    <td><button name="b3">{{ b3 }}</button></td>
+                    <td><button name="b4">{{ b4 }}</button></td>
+                </tr><tr>
+                    <td><button name="b5">{{ b5 }}</button></td>
+                    <td><button name="b6">{{ b6 }}</button></td>
+                    <td><button name="b7">{{ b7 }}</button></td>
+                    <td><button name="b8">{{ b8 }}</button></td>
+                    <td><button name="b9">{{ b9 }}</button></td>
+                </tr><tr>
+                    <td><button name="b10">{{ b10 }}</button></td>
+                    <td><button name="b11">{{ b11 }}</button></td>
+                    <td><button name="b12">{{ b12 }}</button></td>
+                    <td><button name="b13">{{ b13 }}</button></td>
+                    <td><button name="b14">{{ b14 }}</button></td>
+                </tr><tr>
+                    <td><button name="b15">{{ b15 }}</button></td>
+                    <td><button name="b16">{{ b16 }}</button></td>
+                    <td><button name="b17">{{ b17 }}</button></td>
+                    <td><button name="b18">{{ b18 }}</button></td>
+                    <td><button name="b19">{{ b19 }}</button></td>
+                </tr><tr>
+                    <td><button name="b20">{{ b20 }}</button></td>
+                    <td><button name="b21">{{ b21 }}</button></td>
+                    <td><button name="b22">{{ b22 }}</button></td>
+                    <td><button name="b23">{{ b23 }}</button></td>
+                    <td><button name="b24">{{ b24 }}</button></td>
+                </tr>
+            </table>
+            <a href="{% url 'game' %}">もう一度挑戦!</a>
+        </center>
+    </div>
+</div>
+{% endblock %}
