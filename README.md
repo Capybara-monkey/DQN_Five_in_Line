@@ -11,7 +11,7 @@
 
 
 #### スタート画面
-![ホーム](https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/home.png)
+![ホーム](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/master/example/home.png)
 
 #### プレイ中画面
 ![playing](https://github.com/natsu-summer72/DQN_Five_in_Line/tree/master/example/playing.png)
