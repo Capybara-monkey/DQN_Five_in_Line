@@ -6,3 +6,12 @@ class Table(models.Model):
     data_id = models.IntegerField(default=1, primary_key=True)
     tb = models.CharField(max_length=100)
 
+
+class PlayNum(models.Model):
+    data_id = models.IntegerField(default=1, primary_key=True)
+    num = models.IntegerField(default=0)
+
+
+class Memory(models.Model):
+    data_id = models.IntegerField(default=1, primary_key=True)
+    memory = models.CharField(max_length = 1000000)

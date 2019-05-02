@@ -62,7 +62,6 @@ class GameView(View):
             self.num_to_symbol(table)
             return redirect(to="win")
 
-
         """引き分け判定"""
         if self.check_draw(table):
             self.params["result"] = "Draw"
@@ -72,8 +71,6 @@ class GameView(View):
             self.num_to_symbol(table)
             return redirect(to="draw")
 
-
-
         """CPUの入力を反映させる。"""
         while True:
             action = np.random.randint(0,NUM)
@@ -82,16 +79,16 @@ class GameView(View):
 
         table[action] = -1
         self.params["b"+str(action)] = -1
+        data.tb = json.dumps(table)
+        data.save()
 
         if self.check_win(-1, table):
             self.params["result"] = "Lose"
             return redirect("lose")
 
-        data.tb = json.dumps(table)
-        data.save()
-
         self.num_to_symbol(table)
         return render(request, "game/game5.html", self.params)
+
 
     def check_win(self, user, table):
         """勝敗の判定  userは，1がユーザー -1 がCPU"""
@@ -99,15 +96,19 @@ class GameView(View):
             for j in range(3):  #横に移動
                 for i in range(3):
                     if table[5*i+j+5*k]+table[5*i+j+5*k+1]+table[5*i+j+5*k+2]==3*user:  #横
+                        print(table)
                         print("横")
                         return True
                     if table[i+j+5*k]+table[5+i+j+5*k]+table[10+i+j+5*k]==3*user:  #縦
+                        print(table)
                         print("縦")
                         return True
                 if table[0+j+5*k]+table[6+j+5*k]+table[12+j+5*k]==3*user:  #斜め(左上から)
+                    print(table)
                     print("左ななめ")
                     return True
                 if table[2+j+5*k]+table[6+j+5*k]+table[10+j+5*k]==3*user:  #斜め(右上から)
+                    print(table)
                     print("右ななめ")
                     return True
         return False
@@ -115,7 +116,7 @@ class GameView(View):
     def check_draw(self, table):
         """全てのマスが埋まっているかを判定"""
         for i in range(NUM):
-            if table[i] == 0:
+            if not(table[i] == 0):
                 return False
         return True
 
