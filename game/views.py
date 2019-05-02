@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Table
+from .models import Table, PlayNum, Memory
 from django.views.generic import TemplateView
 
 import json
@@ -19,7 +19,8 @@ class GameView(View):
     def get(self, request):
         table = Table.objects.get(data_id=1).tb
         table = json.loads(table)
-        self.params = {}
+        num = PlayNum.objects.get(data_id=1).num
+        self.params = {"play_num": num}
         """数字->○×の変換"""
         self.num_to_symbol(table)
         return render(request, "game/game5.html", self.params)
@@ -27,7 +28,9 @@ class GameView(View):
     def post(self, request):
         data = Table.objects.get(data_id=1)
         table = json.loads(data.tb)
-        self.params = {}
+        play_num = PlayNum.objects.get(data_id=1)
+        num = play_num.num
+        self.params = {"play_num": num}
 
         """Clearボタンが押された場合は初期化を行う"""
         if "clear" in request.POST:
@@ -58,8 +61,9 @@ class GameView(View):
             self.params["result"] = "Win"
             data.tb = json.dumps(table)
             data.save()
-            """数字->○×の変換"""
-            self.num_to_symbol(table)
+            num += 1
+            play_num.num = num
+            play_num.save()
             return redirect(to="win")
 
         """引き分け判定"""
@@ -67,8 +71,9 @@ class GameView(View):
             self.params["result"] = "Draw"
             data.tb = json.dumps(table)
             data.save()
-            """数字->○×の変換"""
-            self.num_to_symbol(table)
+            num += 1
+            play_num.num = num
+            play_num.save()
             return redirect(to="draw")
 
         """CPUの入力を反映させる。"""
@@ -84,6 +89,9 @@ class GameView(View):
 
         if self.check_win(-1, table):
             self.params["result"] = "Lose"
+            num += 1
+            play_num.num = num
+            play_num.save()
             return redirect("lose")
 
         self.num_to_symbol(table)
