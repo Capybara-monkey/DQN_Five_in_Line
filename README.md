@@ -7,12 +7,11 @@
 
 #### 現状
 * とりあえず，5×5マスのテーブルでの三目並べを実装
-* DQNによる学習部分は，未実装
+* DQNによる学習部分は，途中
 
 #### 今後の予定
 * DQNによる学習を実装
-* UIの修正
-
+* 5×5マスのテーブルでは，CPUが勝つのは難しいのでテーブルを大きくする予定。
 
 #### スタート画面
 ![ホーム](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/master/example/home.png)
@@ -22,4 +21,6 @@
 
 #### 結果画面
 ![result](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/master/example/result.png)
+
+
 
