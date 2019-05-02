@@ -16,6 +16,7 @@ INIT_TABLE = [0, 0, 0, 0, 0,
 
 DQNAgent = DQN()
 
+
 class GameView(View):
     def get(self, request):
         table = Table.objects.get(data_id=1).tb
@@ -87,7 +88,9 @@ class GameView(View):
                 if table[action] == 0:
                     break
 
+        state = table
         table[action] = -1
+        new_state = table
         self.params["b"+str(action)] = -1
         data.tb = json.dumps(table)
         data.save()
@@ -98,11 +101,24 @@ class GameView(View):
             play_num.num = num
             play_num.save()
             DQNAgent.save_model()
+            self.pop_memory(state, action,new_state, win=True)
             return redirect("lose")
 
         self.num_to_symbol(table)
         return render(request, "game/game5.html", self.params)
 
+    def pop_memory(self, state, action, new_state, win=False, lose=False, miss=False):
+        reward = 0
+        done = False
+        if win:
+            reward = 1
+            done = True
+        elif lose:
+            reward = -1
+            done = True
+        elif miss:
+            reward = -1
+        DQNAgent.remember(state, action, reward, new_state, done)
 
     def check_win(self, user, table):
         """勝敗の判定  userは，1がユーザー -1 がCPU"""
@@ -135,7 +151,7 @@ class GameView(View):
         return True
 
     def num_to_symbol(self, table):
-        """render用にtableの数字を記号に変換"""
+        """rendering用にtableの数字を記号に変換"""
         for i in range(NUM):
             if table[i] == 0:
                 self.params["b"+str(i)] = " "
@@ -162,7 +178,7 @@ class WinView(TemplateView):
         return context
 
     def num_to_symbol(self, table):
-        """render用にtableの数字を記号に変換"""
+        """rendering用にtableの数字を記号に変換"""
         for i in range(NUM):
             if table[i] == 0:
                 table[i] = " "
@@ -170,7 +186,6 @@ class WinView(TemplateView):
                 table[i] = "○"
             else:
                 table[i]= "×"
-
         return table
 
 class LoseView(TemplateView):
@@ -216,7 +231,7 @@ class DrawView(TemplateView):
         return context
 
     def num_to_symbol(self, table):
-        """render用にtableの数字を記号に変換"""
+        """rendering用にtableの数字を記号に変換"""
         for i in range(NUM):
             if table[i] == 0:
                 table[i] = " "

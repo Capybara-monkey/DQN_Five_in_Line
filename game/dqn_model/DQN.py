@@ -55,8 +55,8 @@ class DQN():
             print("Optimal Action")
             return self._get_optimal_action(self.target_Q, state)
 
-    def _remember(self, history, action, reward, new_state, done):
-        self.memory.append([self._flatten_deque(history), action, reward, new_state if not done else None])
+    def remember(self, state, action, reward, new_state, done):
+        self.memory.append([state, action, reward, new_state if not done else None])
 
     def _build_network(self):
         nn = Sequential()
@@ -97,18 +97,11 @@ class DQN():
     def learn(self, paths):
         self.Q = load_model("Q_network.h5")
         self.target_Q = self._clone_network(self.Q)
-
-        for path, action, reward, new_state, done in paths:
-            for i in range(len(path)):
-                self._remember(path, action, reward, new_state, done)
-                self.step += 1
-            self._replay()
+        self._replay()
 
         if self.step % self.C == 0:
             self.target_Q = self._clone_network(self.Q)
 
-        if self.step%100 == 0:
-            self.target_Q.save("Q_network.h5")
 
     def save_model(self):
         self.target_Q.save("Q_network.h5")
