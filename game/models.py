@@ -15,3 +15,9 @@ class PlayNum(models.Model):
 class Memory(models.Model):
     data_id = models.IntegerField(default=1, primary_key=True)
     memory = models.CharField(max_length = 1000000)
+
+
+class StateAction(models.Model):
+    data_id = models.IntegerField(default=1, primary_key=True)
+    state = models.CharField(max_length=100)
+    action = models.IntegerField(default=0)

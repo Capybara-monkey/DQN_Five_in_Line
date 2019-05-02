@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Table, PlayNum, Memory
+from .models import Table, PlayNum, Memory, StateAction
 from django.views.generic import TemplateView
 from .dqn_model.DQN import DQN
 
@@ -43,6 +43,12 @@ class GameView(View):
                      0, 0, 0, 0, 0]
             data.tb = json.dumps(table)
             data.save()
+            state_action = StateAction.objects.get(data_id=1)
+            state_action.state = json.dumps(INIT_TABLE)
+            state_action.action = 0
+            state_action.next_state = json.dumps(INIT_TABLE)
+            state_action.save()
+
             """数字->○×の変換"""
             self.num_to_symbol(table)
             return render(request, "game/game5.html", self.params)
@@ -58,6 +64,12 @@ class GameView(View):
                 table[i] = 1
                 self.params["b"+str(i)] = 1
 
+        """前回のCPUの状態とそのときの行動を取り出す"""
+        state_action = StateAction.objects.get(data_id=1)
+        state = state_action.state
+        action = state_action.action
+        new_state = table[:]
+
         """ユーザーの勝利判定"""
         if self.check_win(1, table):
             self.params["result"] = "Win"
@@ -67,6 +79,7 @@ class GameView(View):
             play_num.num = num
             play_num.save()
             DQNAgent.save_model()
+            self.pop_memory(state, action, new_state, lose=True)  # CPUの負け
             return redirect(to="win")
 
         """引き分け判定"""
@@ -78,7 +91,11 @@ class GameView(View):
             play_num.num = num
             play_num.save()
             DQNAgent.save_model()
+            self.pop_memory(state, action, new_state, draw=True) #引き分け
             return redirect(to="draw")
+
+        """ ここで，状態遷移が終了なので，pop_memory """
+        self.pop_memory(state, action, new_state)
 
         """CPUの入力を反映させる。"""
         action = DQNAgent.get_action(np.array(table))
@@ -88,26 +105,34 @@ class GameView(View):
                 if table[action] == 0:
                     break
 
-        state = table
+        state = table[:]
         table[action] = -1
-        new_state = table
+        new_state = table[:]
         self.params["b"+str(action)] = -1
         data.tb = json.dumps(table)
         data.save()
 
+        """次のユーザーの一手て負けた時のために，state, action を保存(next_stateはまだわからないので保存しない)"""
+        state_action = StateAction.objects.get(data_id=1)
+        state_action.state = json.dumps(state)
+        state_action.action = action
+        state_action.save()
+
+        """CPUの勝利(ユーザーの敗北)をチェック。勝っていれば，win=Trueで pop_memory"""
         if self.check_win(-1, table):
             self.params["result"] = "Lose"
             num += 1
             play_num.num = num
             play_num.save()
             DQNAgent.save_model()
-            self.pop_memory(state, action,new_state, win=True)
+            self.pop_memory(state, action, new_state, win=True)   #CPUの勝利
             return redirect("lose")
 
+        """まだ勝敗がついていない場合"""
         self.num_to_symbol(table)
         return render(request, "game/game5.html", self.params)
 
-    def pop_memory(self, state, action, new_state, win=False, lose=False, miss=False):
+    def pop_memory(self, state, action, new_state, win=False, lose=False, miss=False, draw=False):
         reward = 0
         done = False
         if win:
@@ -116,8 +141,11 @@ class GameView(View):
         elif lose:
             reward = -1
             done = True
+        elif draw:
+            done=True
         elif miss:
             reward = -1
+        print(state, action, reward, new_state, done)
         DQNAgent.remember(state, action, reward, new_state, done)
 
     def check_win(self, user, table):
@@ -125,21 +153,13 @@ class GameView(View):
         for k in range(3):  #縦に移動
             for j in range(3):  #横に移動
                 for i in range(3):
-                    if table[5*i+j+5*k]+table[5*i+j+5*k+1]+table[5*i+j+5*k+2]==3*user:  #横
-                        print(table)
-                        print("横")
+                    if table[5*i+j+5*k]+table[5*i+j+5*k+1]+table[5*i+j+5*k+2]==3*user:  # 横
                         return True
-                    if table[i+j+5*k]+table[5+i+j+5*k]+table[10+i+j+5*k]==3*user:  #縦
-                        print(table)
-                        print("縦")
+                    if table[i+j+5*k]+table[5+i+j+5*k]+table[10+i+j+5*k]==3*user:  # 縦
                         return True
-                if table[0+j+5*k]+table[6+j+5*k]+table[12+j+5*k]==3*user:  #斜め(左上から)
-                    print(table)
-                    print("左ななめ")
+                if table[0+j+5*k]+table[6+j+5*k]+table[12+j+5*k]==3*user:  # 斜め(左上から)
                     return True
-                if table[2+j+5*k]+table[6+j+5*k]+table[10+j+5*k]==3*user:  #斜め(右上から)
-                    print(table)
-                    print("右ななめ")
+                if table[2+j+5*k]+table[6+j+5*k]+table[10+j+5*k]==3*user:  # 斜め(右上から)
                     return True
         return False
 

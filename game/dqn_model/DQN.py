@@ -94,7 +94,7 @@ class DQN():
         for i in range(self.mb_size):
             self.Q.train_on_batch(history[i, :].reshape(1, -1), Y[i, :].reshape(1, -1))
 
-    def learn(self, paths):
+    def learn(self):
         self.Q = load_model("Q_network.h5")
         self.target_Q = self._clone_network(self.Q)
         self._replay()
