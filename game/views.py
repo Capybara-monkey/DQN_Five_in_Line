@@ -2,18 +2,19 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .models import Table, PlayNum, Memory
 from django.views.generic import TemplateView
+from .dqn_model.DQN import DQN
 
 import json
 import numpy as np
 
 NUM = 25
-
-
 INIT_TABLE = [0, 0, 0, 0, 0,
          0, 0, 0, 0, 0,
          0, 0, 0, 0, 0,
          0, 0, 0, 0, 0,
          0, 0, 0, 0, 0]
+
+DQNAgent = DQN()
 
 class GameView(View):
     def get(self, request):
@@ -64,6 +65,7 @@ class GameView(View):
             num += 1
             play_num.num = num
             play_num.save()
+            DQNAgent.save_model()
             return redirect(to="win")
 
         """引き分け判定"""
@@ -74,13 +76,16 @@ class GameView(View):
             num += 1
             play_num.num = num
             play_num.save()
+            DQNAgent.save_model()
             return redirect(to="draw")
 
         """CPUの入力を反映させる。"""
-        while True:
-            action = np.random.randint(0,NUM)
-            if table[action] == 0:
-                break
+        action = DQNAgent.get_action(np.array(table))
+        if not (table[action]==0):
+            while True:
+                action = np.random.randint(0, NUM)
+                if table[action] == 0:
+                    break
 
         table[action] = -1
         self.params["b"+str(action)] = -1
@@ -92,6 +97,7 @@ class GameView(View):
             num += 1
             play_num.num = num
             play_num.save()
+            DQNAgent.save_model()
             return redirect("lose")
 
         self.num_to_symbol(table)
