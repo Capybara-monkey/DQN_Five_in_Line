@@ -25,6 +25,9 @@ class GameView(View):
         self.params = {"play_num": num}
         """数字->○×の変換"""
         self.num_to_symbol(table)
+        memory = Memory.objects.get(data_id=1).memory
+        memory = json.loads(memory)
+        DQNAgent.set_memory(memory)
         return render(request, "game/game5.html", self.params)
 
     def post(self, request):
@@ -43,11 +46,7 @@ class GameView(View):
                      0, 0, 0, 0, 0]
             data.tb = json.dumps(table)
             data.save()
-            state_action = StateAction.objects.get(data_id=1)
-            state_action.state = json.dumps(INIT_TABLE)
-            state_action.action = 0
-            state_action.next_state = json.dumps(INIT_TABLE)
-            state_action.save()
+            self.reset_state_action()
 
             """数字->○×の変換"""
             self.num_to_symbol(table)
@@ -66,7 +65,7 @@ class GameView(View):
 
         """前回のCPUの状態とそのときの行動を取り出す"""
         state_action = StateAction.objects.get(data_id=1)
-        state = state_action.state
+        state = json.loads(state_action.state)
         action = state_action.action
         new_state = table[:]
 
@@ -75,11 +74,11 @@ class GameView(View):
             self.params["result"] = "Win"
             data.tb = json.dumps(table)
             data.save()
-            num += 1
-            play_num.num = num
-            play_num.save()
+            self.increment_play_num()
             DQNAgent.save_model()
             self.pop_memory(state, action, new_state, lose=True)  # CPUの負け
+            self.save_memory()
+            self.reset_state_action()
             return redirect(to="win")
 
         """引き分け判定"""
@@ -87,28 +86,28 @@ class GameView(View):
             self.params["result"] = "Draw"
             data.tb = json.dumps(table)
             data.save()
-            num += 1
-            play_num.num = num
-            play_num.save()
+            self.increment_play_num()
             DQNAgent.save_model()
-            self.pop_memory(state, action, new_state, draw=True) #引き分け
+            self.pop_memory(state, action, new_state, draw=True) # 引き分け
+            self.save_memory()
+            self.reset_state_action()
             return redirect(to="draw")
 
         """ ここで状態遷移が終了なので，pop_memory """
-        self.pop_memory(state, action, new_state)
+        if not (action==-1):
+            self.pop_memory(state, action, new_state)
 
         """CPUの入力を反映させる。"""
         action = DQNAgent.get_action(np.array(table))
         if not type(action)==int:      # 方策に従う場合は，DQNAgentから，Qの降順 index のリストが返ってくる。
             for idx in np.argsort(action)[0]:    # 空いているマスのうち，Qが最も大きいものを選択する。
-                print(idx)
-                print(type(idx))
                 if table[idx] == 0:
-                    action = idx
-                    print(action)
+                    action = int(idx)
                     break
 
         state = table[:]
+
+        """テーブルの更新と保存"""
         table[action] = -1
         new_state = table[:]
         self.params["b"+str(action)] = -1
@@ -116,24 +115,46 @@ class GameView(View):
         data.save()
 
         """次のユーザーの一手て負けた時のために，state, action を保存(next_stateはまだわからないので保存しない)"""
-        state_action = StateAction.objects.get(data_id=1)
-        state_action.state = json.dumps(state)
-        state_action.action = action
-        state_action.save()
+        self.save_state_action(state, action)
 
         """CPUの勝利(ユーザーの敗北)をチェック。勝っていれば，win=Trueで pop_memory"""
         if self.check_win(-1, table):
             self.params["result"] = "Lose"
-            num += 1
-            play_num.num = num
-            play_num.save()
+            self.increment_play_num()
             DQNAgent.save_model()
-            self.pop_memory(state, action, new_state, win=True)   #CPUの勝利
+            self.pop_memory(state, action, new_state, win=True)   # CPUの勝利
+            self.save_memory()
+            self.reset_state_action()
             return redirect("lose")
 
         """まだ勝敗がついていない場合"""
         self.num_to_symbol(table)
         return render(request, "game/game5.html", self.params)
+
+    def increment_play_num(self):
+        play_num = PlayNum.objects.get(data_id=1)
+        num = play_num.num + 1
+        play_num.num = num
+        play_num.save()
+
+    def save_state_action(self, state, action):
+        state_action = StateAction.objects.get(data_id=1)
+        state_action.state = json.dumps(state)
+        state_action.action = action
+        state_action.save()
+
+
+    def reset_state_action(self):
+        state_action = StateAction.objects.get(data_id=1)
+        state_action.state = json.dumps(INIT_TABLE)
+        state_action.action = -1
+        state_action.save()
+
+    def save_memory(self):
+        memory = Memory.objects.get(data_id=1)
+        M = DQNAgent.get_memory()
+        memory.memory = json.dumps(M)
+        memory.save()
 
     def pop_memory(self, state, action, new_state, win=False, lose=False, miss=False, draw=False):
         reward = 0
@@ -148,7 +169,6 @@ class GameView(View):
             done=True
         elif miss:
             reward = -1
-        print(state, action, reward, new_state, done)
         DQNAgent.remember(state, action, reward, new_state, done)
 
     def check_win(self, user, table):

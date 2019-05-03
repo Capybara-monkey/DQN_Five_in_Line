@@ -16,23 +16,17 @@ STATE_N = ROW*ROW
 ACTION_N = ROW*ROW
 
 class DQN():
-    def __init__(self, memory = [], history_len=1, memory_size=2000, replay_start_size=32, gamma=0.9, eps=1.0, eps_min=1e-3, final_expl_step=4000, mb_size=32, C=20, n_episodes=1000, max_steps=10):
+    def __init__(self, history_len=1, memory_size=2000, gamma=0.9, eps=1.0, eps_min=1e-3, final_expl_step=4000, mb_size=32, C=20):
         self.history_len = history_len
         self.memory_size = memory_size
-        self.replay_start_size = replay_start_size
         self.gamma = gamma
         self.eps = eps
         self.eps_min = eps_min
         self.eps_decay = (eps - eps_min) / final_expl_step
-        self.final_expl_step = final_expl_step
         self.mb_size = mb_size
         self.C = C
-        self.n_episodes = n_episodes
-        self.max_steps = max_steps
         self.step = 0
         self.memory = deque(maxlen = self.memory_size)
-        for i in memory:
-            self.memory.append(i)
         if os.path.exists("Q_network.h5"):
             self.Q = load_model("Q_network.h5")
             print("loading Q-network model")
@@ -42,6 +36,15 @@ class DQN():
 
         self.target_Q = self._clone_network(self.Q)
         self.target_Q._make_predict_function()
+
+    def set_memory(self, memory):
+        self.memory = deque(maxlen = self.memory_size)
+        for i in memory:
+            self.memory.append(i)
+
+    def get_memory(self):
+        print(self.memory)
+        return list(self.memory)
 
     def _get_optimal_action(self, network, state):
         return network.predict(state.reshape(1, -1))
@@ -88,12 +91,16 @@ class DQN():
             Y[i, actions] = rewards[i]
         return history, Y
 
-
     def _replay(self):
         history, Y = self._get_samples()
         for i in range(self.mb_size):
             self.Q.train_on_batch(history[i, :].reshape(1, -1), Y[i, :].reshape(1, -1))
 
+    def save_model(self):
+        self.target_Q.save("Q_network.h5")
+
+
+    """
     def learn(self):
         self.Q = load_model("Q_network.h5")
         self.target_Q = self._clone_network(self.Q)
@@ -101,10 +108,9 @@ class DQN():
 
         if self.step % self.C == 0:
             self.target_Q = self._clone_network(self.Q)
+    """
 
 
-    def save_model(self):
-        self.target_Q.save("Q_network.h5")
 
 
 
