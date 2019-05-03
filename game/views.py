@@ -94,15 +94,18 @@ class GameView(View):
             self.pop_memory(state, action, new_state, draw=True) #引き分け
             return redirect(to="draw")
 
-        """ ここで，状態遷移が終了なので，pop_memory """
+        """ ここで状態遷移が終了なので，pop_memory """
         self.pop_memory(state, action, new_state)
 
         """CPUの入力を反映させる。"""
         action = DQNAgent.get_action(np.array(table))
-        if not (table[action]==0):
-            while True:
-                action = np.random.randint(0, NUM)
-                if table[action] == 0:
+        if not type(action)==int:      # 方策に従う場合は，DQNAgentから，Qの降順 index のリストが返ってくる。
+            for idx in np.argsort(action)[0]:    # 空いているマスのうち，Qが最も大きいものを選択する。
+                print(idx)
+                print(type(idx))
+                if table[idx] == 0:
+                    action = idx
+                    print(action)
                     break
 
         state = table[:]

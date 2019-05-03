@@ -44,7 +44,7 @@ class DQN():
         self.target_Q._make_predict_function()
 
     def _get_optimal_action(self, network, state):
-        return np.argmax(network.predict(state.reshape(1, -1)))
+        return network.predict(state.reshape(1, -1))
 
     def get_action(self, state):
         if np.random.random() > self.eps:
