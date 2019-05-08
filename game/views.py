@@ -3,11 +3,9 @@ from django.views import View
 from .models import Table, PlayNum, Memory, StateAction
 from django.views.generic import TemplateView
 from .dqn_model.DQN import DQN
-import keras.backend as K
 
 import json
 import numpy as np
-import tensorflow as tf
 
 NUM = 25
 INIT_TABLE = [0, 0, 0, 0, 0,
@@ -108,6 +106,12 @@ class GameView(View):
                 if table[idx] == 0:
                     action = int(idx)
                     break
+        else:  # ランダムな行動の場合(actionがintの場合)
+            if not table[action] == 0:
+                while True:   # 空いてるマスでランダムな行動
+                    action = np.randint(0, NUM)
+                    if table[action]==0:
+                        break
 
         state = table[:]
 
