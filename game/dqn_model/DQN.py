@@ -8,6 +8,7 @@ from keras.layers import Dense
 import matplotlib.pyplot as plt
 import keras.backend as K
 import tensorflow as tf
+from ..models import Epsilon
 
 plt.style.use('seaborn')
 plt.rcParams['font.family'] = 'IPAexGothic'
@@ -18,10 +19,11 @@ STATE_N = ROW*ROW
 ACTION_N = ROW*ROW
 
 class DQN():
-    def __init__(self, memory_size=2000, gamma=0.9, eps=1.0, eps_min=1e-3, final_expl_step=4000, mb_size=4, C=20):
+    def __init__(self, memory_size=2000, gamma=0.9, eps=1.0, eps_min=1e-3, final_expl_step=4000, mb_size=20, C=20):
         self.memory_size = memory_size
         self.gamma = gamma
-        self.eps = eps
+        self.eps_db = Epsilon.objects.get(data_id=1)
+        self.eps = self.eps_db.eps
         self.eps_min = eps_min
         self.eps_decay = (eps - eps_min) / final_expl_step
         self.mb_size = mb_size
@@ -50,8 +52,10 @@ class DQN():
         return network.predict(state.reshape(1, -1))
 
     def get_action(self, state):
-        if np.random.random() > self.eps:
+        if np.random.rand() < self.eps:
             self.eps = max(self.eps - self.eps_decay, self.eps_min)
+            self.eps_db.eps = self.eps
+            self.eps_db.save()
             print("Random Action")
             return np.random.randint(0,ACTION_N)
         else:
