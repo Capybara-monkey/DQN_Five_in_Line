@@ -3,9 +3,11 @@ from django.views import View
 from .models import Table, PlayNum, Memory, StateAction
 from django.views.generic import TemplateView
 from .dqn_model.DQN import DQN
+import keras.backend as K
 
 import json
 import numpy as np
+import tensorflow as tf
 
 NUM = 25
 INIT_TABLE = [0, 0, 0, 0, 0,
@@ -74,10 +76,11 @@ class GameView(View):
             self.params["result"] = "Win"
             data.tb = json.dumps(table)
             data.save()
-            self.increment_play_num()
-            DQNAgent.save_model()
+            self.increment_play_num()  #プレイ回数のインクリメント
+            DQNAgent.replay()  #学習
+            DQNAgent.save_model()  #モデルの保存
             self.pop_memory(state, action, new_state, lose=True)  # CPUの負け
-            self.save_memory()
+            self.save_memory()  #replay bufferの保存
             self.reset_state_action()
             return redirect(to="win")
 
@@ -86,10 +89,11 @@ class GameView(View):
             self.params["result"] = "Draw"
             data.tb = json.dumps(table)
             data.save()
-            self.increment_play_num()
-            DQNAgent.save_model()
+            self.increment_play_num()   #プレイ回数のインクリメント
+            DQNAgent.replay()  #学習
+            DQNAgent.save_model()   #モデルの保存
             self.pop_memory(state, action, new_state, draw=True) # 引き分け
-            self.save_memory()
+            self.save_memory()    #replay bufferの保存
             self.reset_state_action()
             return redirect(to="draw")
 
@@ -120,10 +124,11 @@ class GameView(View):
         """CPUの勝利(ユーザーの敗北)をチェック。勝っていれば，win=Trueで pop_memory"""
         if self.check_win(-1, table):
             self.params["result"] = "Lose"
-            self.increment_play_num()
-            DQNAgent.save_model()
+            self.increment_play_num()  #プレイ回数のインクリメント
+            DQNAgent.replay()  #学習
+            DQNAgent.save_model()   # モデルの保存
             self.pop_memory(state, action, new_state, win=True)   # CPUの勝利
-            self.save_memory()
+            self.save_memory()  #replay bufferの保存
             self.reset_state_action()
             return redirect("lose")
 
@@ -157,18 +162,18 @@ class GameView(View):
         memory.save()
 
     def pop_memory(self, state, action, new_state, win=False, lose=False, miss=False, draw=False):
-        reward = 0
+        reward = 0.0
         done = False
         if win:
-            reward = 1
+            reward = 1.0
             done = True
         elif lose:
-            reward = -1
+            reward = -1.0
             done = True
         elif draw:
             done=True
         elif miss:
-            reward = -1
+            reward = -1.0
         DQNAgent.remember(state, action, reward, new_state, done)
 
     def check_win(self, user, table):

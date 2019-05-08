@@ -6,18 +6,19 @@ from collections import deque
 from keras.models import Sequential, load_model
 from keras.layers import Dense
 import matplotlib.pyplot as plt
+import keras.backend as K
+import tensorflow as tf
 
 plt.style.use('seaborn')
 plt.rcParams['font.family'] = 'IPAexGothic'
 
-
+graph = tf.get_default_graph()
 ROW=5
 STATE_N = ROW*ROW
 ACTION_N = ROW*ROW
 
 class DQN():
-    def __init__(self, history_len=1, memory_size=2000, gamma=0.9, eps=1.0, eps_min=1e-3, final_expl_step=4000, mb_size=32, C=20):
-        self.history_len = history_len
+    def __init__(self, memory_size=2000, gamma=0.9, eps=1.0, eps_min=1e-3, final_expl_step=4000, mb_size=4, C=20):
         self.memory_size = memory_size
         self.gamma = gamma
         self.eps = eps
@@ -43,7 +44,6 @@ class DQN():
             self.memory.append(i)
 
     def get_memory(self):
-        print(self.memory)
         return list(self.memory)
 
     def _get_optimal_action(self, network, state):
@@ -77,40 +77,29 @@ class DQN():
 
     def _get_samples(self):
         samples = random.sample(self.memory, self.mb_size)
-        history = np.array([s[0] for s in samples])
-        Y = self.target_Q.predict(history)
+        states = np.array([s[0] for s in samples])
+        Y = self.target_Q.predict(states)
         actions = [s[1] for s in samples]
         rewards = np.array([s[2] for s in samples])
         future_rewards = np.zeros(self.mb_size)
         new_states_idx = [i for i, s in enumerate(samples) if s[3] is not None]
+        print(new_states_idx)
         new_states = np.array([s[3] for s in itemgetter(*new_states_idx)(samples)])
-        new_history = np.hstack([history[new_states_idx, self.env.observation_space.n:], new_states])
-        future_rewards[new_states_idx] = np.max(self.target_Q.predict(new_history), axis=1)
+        future_rewards[new_states_idx] = np.max(self.target_Q.predict(new_states), axis=1)
         rewards += self.gamma*future_rewards
         for i, r in enumerate(Y):
             Y[i, actions] = rewards[i]
-        return history, Y
+        return states, Y
 
-    def _replay(self):
-        history, Y = self._get_samples()
-        for i in range(self.mb_size):
-            self.Q.train_on_batch(history[i, :].reshape(1, -1), Y[i, :].reshape(1, -1))
+    def replay(self):
+        if len(self.memory) >= self.mb_size:
+            print("Start Replay")
+            states, Y = self._get_samples()
+            for i in range(self.mb_size):
+                global graph
+                with graph.as_default():
+                    self.Q.fit(states.reshape(-1, STATE_N), Y.reshape(-1, ACTION_N))
+                print("finish training")
 
     def save_model(self):
         self.target_Q.save("Q_network.h5")
-
-
-    """
-    def learn(self):
-        self.Q = load_model("Q_network.h5")
-        self.target_Q = self._clone_network(self.Q)
-        self._replay()
-
-        if self.step % self.C == 0:
-            self.target_Q = self._clone_network(self.Q)
-    """
-
-
-
-
-
