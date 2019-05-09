@@ -14,7 +14,7 @@ plt.style.use('seaborn')
 plt.rcParams['font.family'] = 'IPAexGothic'
 
 graph = tf.get_default_graph()
-ROW=5
+ROW=15
 STATE_N = ROW*ROW
 ACTION_N = ROW*ROW
 

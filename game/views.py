@@ -7,12 +7,22 @@ from .dqn_model.DQN import DQN
 import json
 import numpy as np
 
-NUM = 25
-INIT_TABLE = [0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0]
+NUM = 225
+INIT_TABLE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 DQNAgent = DQN()
 
@@ -28,7 +38,7 @@ class GameView(View):
         memory = Memory.objects.get(data_id=1).memory
         memory = json.loads(memory)
         DQNAgent.set_memory(memory)
-        return render(request, "game/game5.html", self.params)
+        return render(request, "game/game15.html", self.params)
 
     def post(self, request):
         data = Table.objects.get(data_id=1)
@@ -39,18 +49,14 @@ class GameView(View):
 
         """Clearボタンが押された場合は初期化を行う"""
         if "clear" in request.POST:
-            table = [0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0]
+            table = INIT_TABLE
             data.tb = json.dumps(table)
             data.save()
             self.reset_state_action()
 
             """数字->○×の変換"""
             self.num_to_symbol(table)
-            return render(request, "game/game5.html", self.params)
+            return render(request, "game/game15.html", self.params)
 
         """ユーザーの入力を反映させる。"""
         for i in range(NUM):
@@ -59,7 +65,7 @@ class GameView(View):
             if "b"+ str(i) in request.POST:
                 if not table[i] == 0:  #既に選択されているマスの場合
                     self.num_to_symbol(table)
-                    return render(request, "game/game5.html", self.params)
+                    return render(request, "game/game15.html", self.params)
                 table[i] = 1
                 self.params["b"+str(i)] = 1
 
@@ -109,7 +115,7 @@ class GameView(View):
         else:  # ランダムな行動の場合(actionがintの場合)
             if not table[action] == 0:
                 while True:   # 空いてるマスでランダムな行動
-                    action = np.randint(0, NUM)
+                    action = np.random.randint(0, NUM)
                     if table[action]==0:
                         break
 
@@ -138,7 +144,7 @@ class GameView(View):
 
         """まだ勝敗がついていない場合"""
         self.num_to_symbol(table)
-        return render(request, "game/game5.html", self.params)
+        return render(request, "game/game15.html", self.params)
 
     def increment_play_num(self):
         play_num = PlayNum.objects.get(data_id=1)
@@ -182,16 +188,16 @@ class GameView(View):
 
     def check_win(self, user, table):
         """勝敗の判定  userは，1がユーザー -1 がCPU"""
-        for k in range(3):  #縦に移動
-            for j in range(3):  #横に移動
-                for i in range(3):
-                    if table[5*i+j+5*k]+table[5*i+j+5*k+1]+table[5*i+j+5*k+2]==3*user:  # 横
+        for k in range(11):  #縦に移動
+            for j in range(11):  #横に移動
+                for i in range(5):
+                    if table[15*i+j+15*k]+table[15*i+j+15*k+1]+table[15*i+j+15*k+2]+table[15*i+j+15*k+3]+table[15*i+j+15*k+4]==5*user:  # 横
                         return True
-                    if table[i+j+5*k]+table[5+i+j+5*k]+table[10+i+j+5*k]==3*user:  # 縦
+                    if table[i+j+15*k]+table[15+i+j+15*k]+table[30+i+j+15*k]+table[45+i+j+15*k]+table[60+i+j+15*k]==5*user:  # 縦
                         return True
-                if table[0+j+5*k]+table[6+j+5*k]+table[12+j+5*k]==3*user:  # 斜め(左上から)
+                if table[0+j+15*k]+table[16+j+15*k]+table[32+j+15*k]+table[48+j+15*k]+table[64+j+15*k]==5*user:  # 斜め(左上から)
                     return True
-                if table[2+j+5*k]+table[6+j+5*k]+table[10+j+5*k]==3*user:  # 斜め(右上から)
+                if table[4+j+15*k]+table[18+j+15*k]+table[32+j+15*k]+table[46+j+15*k]+table[60+j+15*k]==5*user:  # 斜め(右上から)
                     return True
         return False
 

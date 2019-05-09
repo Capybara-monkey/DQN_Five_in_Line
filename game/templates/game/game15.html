@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+button {
+  width:30px;
+  height:30px;
+  background-color:#EDFFBB;
+}
+
+button.btn-gradient-flat {
+  display: inline-block;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  color: #FFF;
+  background-image: linear-gradient(#6795fd 0%, #67ceff 100%);
+  transition: .4s;
+  width: 150px;
+  height: 75px;
+  font-size: 1.5em;
+}
+
+.btn-gradient-flat:hover {
+  background-image: linear-gradient(#6795fd 0%, #67ceff 70%);
+}
+
+
+</style>
+{% endblock %}
+
+{% block title %}AI五目並べ{% endblock title %}
+
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="">AI五目並べ</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+
+<div class="container" style="padding:30px 0 0 0">
+    <div class="jumbotron bg-white">
+        <h3>AI五目並べ</h3>
+        <h5>Deep Q-NetworkによるCPU</h5>
+        <center><h5>現在までの対戦数 : {{ play_num }}</h5></center>
+    </div>
+    <div id="block">
+        <center>
+            <table>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <tr>
+                        <td><button type="submit" name="b0">{{ b0 }}</button></td>
+                        <td><button type="submit" name="b1">{{ b1 }}</button></td>
+                        <td><button type="submit" name="b2">{{ b2 }}</button></td>
+                        <td><button type="submit" name="b3">{{ b3 }}</button></td>
+                        <td><button type="submit" name="b4">{{ b4 }}</button></td>
+                        <td><button type="submit" name="b5">{{ b5 }}</button></td>
+                        <td><button type="submit" name="b6">{{ b6 }}</button></td>
+                        <td><button type="submit" name="b7">{{ b7 }}</button></td>
+                        <td><button type="submit" name="b8">{{ b8 }}</button></td>
+                        <td><button type="submit" name="b9">{{ b9 }}</button></td>
+                        <td><button type="submit" name="b10">{{ b10 }}</button></td>
+                        <td><button type="submit" name="b11">{{ b11 }}</button></td>
+                        <td><button type="submit" name="b12">{{ b12 }}</button></td>
+                        <td><button type="submit" name="b13">{{ b13 }}</button></td>
+                        <td><button type="submit" name="b14">{{ b14 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b15">{{ b15 }}</button></td>
+                        <td><button type="submit" name="b16">{{ b16 }}</button></td>
+                        <td><button type="submit" name="b17">{{ b17 }}</button></td>
+                        <td><button type="submit" name="b18">{{ b18 }}</button></td>
+                        <td><button type="submit" name="b19">{{ b19 }}</button></td>
+                        <td><button type="submit" name="b20">{{ b20 }}</button></td>
+                        <td><button type="submit" name="b21">{{ b21 }}</button></td>
+                        <td><button type="submit" name="b22">{{ b22 }}</button></td>
+                        <td><button type="submit" name="b23">{{ b23 }}</button></td>
+                        <td><button type="submit" name="b24">{{ b24 }}</button></td>
+                        <td><button type="submit" name="b25">{{ b25 }}</button></td>
+                        <td><button type="submit" name="b26">{{ b26 }}</button></td>
+                        <td><button type="submit" name="b27">{{ b27 }}</button></td>
+                        <td><button type="submit" name="b28">{{ b28 }}</button></td>
+                        <td><button type="submit" name="b29">{{ b29 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b30">{{ b30 }}</button></td>
+                        <td><button type="submit" name="b31">{{ b31 }}</button></td>
+                        <td><button type="submit" name="b32">{{ b32 }}</button></td>
+                        <td><button type="submit" name="b33">{{ b33 }}</button></td>
+                        <td><button type="submit" name="b34">{{ b34 }}</button></td>
+                        <td><button type="submit" name="b35">{{ b35 }}</button></td>
+                        <td><button type="submit" name="b36">{{ b36 }}</button></td>
+                        <td><button type="submit" name="b37">{{ b37 }}</button></td>
+                        <td><button type="submit" name="b38">{{ b38 }}</button></td>
+                        <td><button type="submit" name="b39">{{ b39 }}</button></td>
+                        <td><button type="submit" name="b40">{{ b40 }}</button></td>
+                        <td><button type="submit" name="b41">{{ b41 }}</button></td>
+                        <td><button type="submit" name="b42">{{ b42 }}</button></td>
+                        <td><button type="submit" name="b43">{{ b43 }}</button></td>
+                        <td><button type="submit" name="b44">{{ b44 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b45">{{ b45 }}</button></td>
+                        <td><button type="submit" name="b46">{{ b46 }}</button></td>
+                        <td><button type="submit" name="b47">{{ b47 }}</button></td>
+                        <td><button type="submit" name="b48">{{ b48 }}</button></td>
+                        <td><button type="submit" name="b49">{{ b49 }}</button></td>
+                        <td><button type="submit" name="b50">{{ b50 }}</button></td>
+                        <td><button type="submit" name="b51">{{ b51 }}</button></td>
+                        <td><button type="submit" name="b52">{{ b52 }}</button></td>
+                        <td><button type="submit" name="b53">{{ b53 }}</button></td>
+                        <td><button type="submit" name="b54">{{ b54 }}</button></td>
+                        <td><button type="submit" name="b55">{{ b55 }}</button></td>
+                        <td><button type="submit" name="b56">{{ b56 }}</button></td>
+                        <td><button type="submit" name="b57">{{ b57 }}</button></td>
+                        <td><button type="submit" name="b58">{{ b58 }}</button></td>
+                        <td><button type="submit" name="b59">{{ b59 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b60">{{ b60 }}</button></td>
+                        <td><button type="submit" name="b61">{{ b61 }}</button></td>
+                        <td><button type="submit" name="b62">{{ b62 }}</button></td>
+                        <td><button type="submit" name="b63">{{ b63 }}</button></td>
+                        <td><button type="submit" name="b64">{{ b64 }}</button></td>
+                        <td><button type="submit" name="b65">{{ b65 }}</button></td>
+                        <td><button type="submit" name="b66">{{ b66 }}</button></td>
+                        <td><button type="submit" name="b67">{{ b67 }}</button></td>
+                        <td><button type="submit" name="b68">{{ b68 }}</button></td>
+                        <td><button type="submit" name="b69">{{ b69 }}</button></td>
+                        <td><button type="submit" name="b70">{{ b70 }}</button></td>
+                        <td><button type="submit" name="b71">{{ b71 }}</button></td>
+                        <td><button type="submit" name="b72">{{ b72 }}</button></td>
+                        <td><button type="submit" name="b73">{{ b73 }}</button></td>
+                        <td><button type="submit" name="b74">{{ b74 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b75">{{ b75 }}</button></td>
+                        <td><button type="submit" name="b76">{{ b76 }}</button></td>
+                        <td><button type="submit" name="b77">{{ b77 }}</button></td>
+                        <td><button type="submit" name="b78">{{ b78 }}</button></td>
+                        <td><button type="submit" name="b79">{{ b79 }}</button></td>
+                        <td><button type="submit" name="b80">{{ b80 }}</button></td>
+                        <td><button type="submit" name="b81">{{ b81 }}</button></td>
+                        <td><button type="submit" name="b82">{{ b82 }}</button></td>
+                        <td><button type="submit" name="b83">{{ b83 }}</button></td>
+                        <td><button type="submit" name="b84">{{ b84 }}</button></td>
+                        <td><button type="submit" name="b85">{{ b85 }}</button></td>
+                        <td><button type="submit" name="b86">{{ b86 }}</button></td>
+                        <td><button type="submit" name="b87">{{ b87 }}</button></td>
+                        <td><button type="submit" name="b88">{{ b88 }}</button></td>
+                        <td><button type="submit" name="b89">{{ b89 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b90">{{ b90 }}</button></td>
+                        <td><button type="submit" name="b91">{{ b91 }}</button></td>
+                        <td><button type="submit" name="b92">{{ b92 }}</button></td>
+                        <td><button type="submit" name="b93">{{ b93 }}</button></td>
+                        <td><button type="submit" name="b94">{{ b94 }}</button></td>
+                        <td><button type="submit" name="b95">{{ b95 }}</button></td>
+                        <td><button type="submit" name="b96">{{ b96 }}</button></td>
+                        <td><button type="submit" name="b97">{{ b97 }}</button></td>
+                        <td><button type="submit" name="b98">{{ b98 }}</button></td>
+                        <td><button type="submit" name="b99">{{ b99 }}</button></td>
+                        <td><button type="submit" name="b100">{{ b100 }}</button></td>
+                        <td><button type="submit" name="b101">{{ b101 }}</button></td>
+                        <td><button type="submit" name="b102">{{ b102 }}</button></td>
+                        <td><button type="submit" name="b103">{{ b103 }}</button></td>
+                        <td><button type="submit" name="b104">{{ b104 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b105">{{ b105 }}</button></td>
+                        <td><button type="submit" name="b106">{{ b106 }}</button></td>
+                        <td><button type="submit" name="b107">{{ b107 }}</button></td>
+                        <td><button type="submit" name="b108">{{ b108 }}</button></td>
+                        <td><button type="submit" name="b109">{{ b109 }}</button></td>
+                        <td><button type="submit" name="b110">{{ b110 }}</button></td>
+                        <td><button type="submit" name="b111">{{ b111 }}</button></td>
+                        <td><button type="submit" name="b112">{{ b112 }}</button></td>
+                        <td><button type="submit" name="b113">{{ b113 }}</button></td>
+                        <td><button type="submit" name="b114">{{ b114 }}</button></td>
+                        <td><button type="submit" name="b115">{{ b115 }}</button></td>
+                        <td><button type="submit" name="b116">{{ b116 }}</button></td>
+                        <td><button type="submit" name="b117">{{ b117 }}</button></td>
+                        <td><button type="submit" name="b118">{{ b118 }}</button></td>
+                        <td><button type="submit" name="b119">{{ b119 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b120">{{ b120 }}</button></td>
+                        <td><button type="submit" name="b121">{{ b121 }}</button></td>
+                        <td><button type="submit" name="b122">{{ b122 }}</button></td>
+                        <td><button type="submit" name="b123">{{ b123 }}</button></td>
+                        <td><button type="submit" name="b124">{{ b124 }}</button></td>
+                        <td><button type="submit" name="b125">{{ b125 }}</button></td>
+                        <td><button type="submit" name="b126">{{ b126 }}</button></td>
+                        <td><button type="submit" name="b127">{{ b127 }}</button></td>
+                        <td><button type="submit" name="b128">{{ b128 }}</button></td>
+                        <td><button type="submit" name="b129">{{ b129 }}</button></td>
+                        <td><button type="submit" name="b130">{{ b130 }}</button></td>
+                        <td><button type="submit" name="b131">{{ b131 }}</button></td>
+                        <td><button type="submit" name="b132">{{ b132 }}</button></td>
+                        <td><button type="submit" name="b133">{{ b133 }}</button></td>
+                        <td><button type="submit" name="b134">{{ b134 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b135">{{ b135 }}</button></td>
+                        <td><button type="submit" name="b136">{{ b136 }}</button></td>
+                        <td><button type="submit" name="b137">{{ b137 }}</button></td>
+                        <td><button type="submit" name="b138">{{ b138 }}</button></td>
+                        <td><button type="submit" name="b139">{{ b139 }}</button></td>
+                        <td><button type="submit" name="b140">{{ b140 }}</button></td>
+                        <td><button type="submit" name="b141">{{ b141 }}</button></td>
+                        <td><button type="submit" name="b142">{{ b142 }}</button></td>
+                        <td><button type="submit" name="b143">{{ b143 }}</button></td>
+                        <td><button type="submit" name="b144">{{ b144 }}</button></td>
+                        <td><button type="submit" name="b145">{{ b145 }}</button></td>
+                        <td><button type="submit" name="b146">{{ b146 }}</button></td>
+                        <td><button type="submit" name="b147">{{ b147 }}</button></td>
+                        <td><button type="submit" name="b148">{{ b148 }}</button></td>
+                        <td><button type="submit" name="b149">{{ b149 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b150">{{ b150 }}</button></td>
+                        <td><button type="submit" name="b151">{{ b151 }}</button></td>
+                        <td><button type="submit" name="b152">{{ b152 }}</button></td>
+                        <td><button type="submit" name="b153">{{ b153 }}</button></td>
+                        <td><button type="submit" name="b154">{{ b154 }}</button></td>
+                        <td><button type="submit" name="b155">{{ b155 }}</button></td>
+                        <td><button type="submit" name="b156">{{ b156 }}</button></td>
+                        <td><button type="submit" name="b157">{{ b157 }}</button></td>
+                        <td><button type="submit" name="b158">{{ b158 }}</button></td>
+                        <td><button type="submit" name="b159">{{ b159 }}</button></td>
+                        <td><button type="submit" name="b160">{{ b160 }}</button></td>
+                        <td><button type="submit" name="b161">{{ b161 }}</button></td>
+                        <td><button type="submit" name="b162">{{ b162 }}</button></td>
+                        <td><button type="submit" name="b163">{{ b163 }}</button></td>
+                        <td><button type="submit" name="b164">{{ b164 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b165">{{ b165 }}</button></td>
+                        <td><button type="submit" name="b166">{{ b166 }}</button></td>
+                        <td><button type="submit" name="b167">{{ b167 }}</button></td>
+                        <td><button type="submit" name="b168">{{ b168 }}</button></td>
+                        <td><button type="submit" name="b169">{{ b169 }}</button></td>
+                        <td><button type="submit" name="b170">{{ b170 }}</button></td>
+                        <td><button type="submit" name="b171">{{ b171 }}</button></td>
+                        <td><button type="submit" name="b172">{{ b172 }}</button></td>
+                        <td><button type="submit" name="b173">{{ b173 }}</button></td>
+                        <td><button type="submit" name="b174">{{ b174 }}</button></td>
+                        <td><button type="submit" name="b175">{{ b175 }}</button></td>
+                        <td><button type="submit" name="b176">{{ b176 }}</button></td>
+                        <td><button type="submit" name="b177">{{ b177 }}</button></td>
+                        <td><button type="submit" name="b178">{{ b178 }}</button></td>
+                        <td><button type="submit" name="b179">{{ b179 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b180">{{ b180 }}</button></td>
+                        <td><button type="submit" name="b181">{{ b181 }}</button></td>
+                        <td><button type="submit" name="b182">{{ b182 }}</button></td>
+                        <td><button type="submit" name="b183">{{ b183 }}</button></td>
+                        <td><button type="submit" name="b184">{{ b184 }}</button></td>
+                        <td><button type="submit" name="b185">{{ b185 }}</button></td>
+                        <td><button type="submit" name="b186">{{ b186 }}</button></td>
+                        <td><button type="submit" name="b187">{{ b187 }}</button></td>
+                        <td><button type="submit" name="b188">{{ b188 }}</button></td>
+                        <td><button type="submit" name="b189">{{ b189 }}</button></td>
+                        <td><button type="submit" name="b190">{{ b190 }}</button></td>
+                        <td><button type="submit" name="b191">{{ b191 }}</button></td>
+                        <td><button type="submit" name="b192">{{ b192 }}</button></td>
+                        <td><button type="submit" name="b193">{{ b193 }}</button></td>
+                        <td><button type="submit" name="b194">{{ b194 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b195">{{ b195 }}</button></td>
+                        <td><button type="submit" name="b196">{{ b196 }}</button></td>
+                        <td><button type="submit" name="b197">{{ b197 }}</button></td>
+                        <td><button type="submit" name="b198">{{ b198 }}</button></td>
+                        <td><button type="submit" name="b199">{{ b199 }}</button></td>
+                        <td><button type="submit" name="b200">{{ b200 }}</button></td>
+                        <td><button type="submit" name="b201">{{ b201 }}</button></td>
+                        <td><button type="submit" name="b202">{{ b202 }}</button></td>
+                        <td><button type="submit" name="b203">{{ b203 }}</button></td>
+                        <td><button type="submit" name="b204">{{ b204 }}</button></td>
+                        <td><button type="submit" name="b205">{{ b205 }}</button></td>
+                        <td><button type="submit" name="b206">{{ b206 }}</button></td>
+                        <td><button type="submit" name="b207">{{ b207 }}</button></td>
+                        <td><button type="submit" name="b208">{{ b208 }}</button></td>
+                        <td><button type="submit" name="b209">{{ b209 }}</button></td>
+                    </tr>
+                    <tr>
+                        <td><button type="submit" name="b210">{{ b210 }}</button></td>
+                        <td><button type="submit" name="b211">{{ b211 }}</button></td>
+                        <td><button type="submit" name="b212">{{ b212 }}</button></td>
+                        <td><button type="submit" name="b213">{{ b213 }}</button></td>
+                        <td><button type="submit" name="b214">{{ b214 }}</button></td>
+                        <td><button type="submit" name="b215">{{ b215 }}</button></td>
+                        <td><button type="submit" name="b216">{{ b216 }}</button></td>
+                        <td><button type="submit" name="b217">{{ b217 }}</button></td>
+                        <td><button type="submit" name="b218">{{ b218 }}</button></td>
+                        <td><button type="submit" name="b219">{{ b219 }}</button></td>
+                        <td><button type="submit" name="b220">{{ b220 }}</button></td>
+                        <td><button type="submit" name="b221">{{ b221 }}</button></td>
+                        <td><button type="submit" name="b222">{{ b222 }}</button></td>
+                        <td><button type="submit" name="b223">{{ b223 }}</button></td>
+                        <td><button type="submit" name="b224">{{ b224 }}</button></td>
+                    </tr>
+            </table>
+            <br>
+            {% if result %}
+            {{ result }}
+            {% else %}
+            <button type="submit" name="clear" class="btn-gradient-flat">Clear</button>
+            {% endif %}
+            </form>
+        </center>
+    </div>
+    <p id="result" class="ready"></p>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
