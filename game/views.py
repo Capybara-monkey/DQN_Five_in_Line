@@ -7,12 +7,22 @@ from .dqn_model.DQN import DQN
 import json
 import numpy as np
 
-NUM = 25
-INIT_TABLE = [0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0]
+NUM = 225
+INIT_TABLE = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 DQNAgent = DQN()
 
@@ -28,7 +38,7 @@ class GameView(View):
         memory = Memory.objects.get(data_id=1).memory
         memory = json.loads(memory)
         DQNAgent.set_memory(memory)
-        return render(request, "game/game5.html", self.params)
+        return render(request, "game/game15.html", self.params)
 
     def post(self, request):
         data = Table.objects.get(data_id=1)
@@ -39,18 +49,14 @@ class GameView(View):
 
         """Clearボタンが押された場合は初期化を行う"""
         if "clear" in request.POST:
-            table = [0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0]
+            table = INIT_TABLE
             data.tb = json.dumps(table)
             data.save()
             self.reset_state_action()
 
             """数字->○×の変換"""
             self.num_to_symbol(table)
-            return render(request, "game/game5.html", self.params)
+            return render(request, "game/game15.html", self.params)
 
         """ユーザーの入力を反映させる。"""
         for i in range(NUM):
@@ -59,7 +65,7 @@ class GameView(View):
             if "b"+ str(i) in request.POST:
                 if not table[i] == 0:  #既に選択されているマスの場合
                     self.num_to_symbol(table)
-                    return render(request, "game/game5.html", self.params)
+                    return render(request, "game/game15.html", self.params)
                 table[i] = 1
                 self.params["b"+str(i)] = 1
 
@@ -109,7 +115,7 @@ class GameView(View):
         else:  # ランダムな行動の場合(actionがintの場合)
             if not table[action] == 0:
                 while True:   # 空いてるマスでランダムな行動
-                    action = np.randint(0, NUM)
+                    action = np.random.randint(0, NUM)
                     if table[action]==0:
                         break
 
@@ -138,7 +144,7 @@ class GameView(View):
 
         """まだ勝敗がついていない場合"""
         self.num_to_symbol(table)
-        return render(request, "game/game5.html", self.params)
+        return render(request, "game/game15.html", self.params)
 
     def increment_play_num(self):
         play_num = PlayNum.objects.get(data_id=1)
