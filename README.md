@@ -12,13 +12,13 @@
 * 5×5マスのテーブルでは，CPUが勝つのは難しいのでテーブルを大きくする予定。
 
 #### スタート画面
-![ホーム](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/master/example/home.png)
+![ホーム](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/dev/15x15/example/home.png)
 
 #### プレイ中画面
-![playing](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/master/example/playing.png)
+![playing](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/dev/15x15/example/playing.png)
 
 #### 結果画面
-![result](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/master/example/result.png)
+![result](https://github.com/natsu-summer72/DQN_Five_in_Line/blob/dev/15x15/example/result.png)
 
 
 
