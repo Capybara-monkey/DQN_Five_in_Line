@@ -3,11 +3,12 @@
 {% block extra_css %}
 <style>
 button {
-width:30px;
-height:30px;
+  width:30px;
+  height:30px;
+  background-color:#EDFFBB;
 }
 
-.btn-gradient-flat {
+button.btn-gradient-flat {
   display: inline-block;
   padding: 0.5em 1em;
   text-decoration: none;
@@ -15,6 +16,7 @@ height:30px;
   background-image: linear-gradient(#6795fd 0%, #67ceff 100%);
   transition: .4s;
   width: 150px;
+  height: 75px;
   font-size: 1.5em;
 }
 
@@ -39,9 +41,9 @@ height:30px;
 
 <div class="container" style="padding:30px 0 0 0">
     <div class="jumbotron bg-white">
-        <h1>AI五目並べ</h1>
-        <h3>Deep Q-NetworkによるCPU</h3><br>
-        <center><h3>現在までの対戦数 : {{ play_num }}</h3></center>
+        <h3>AI五目並べ</h3>
+        <h5>Deep Q-NetworkによるCPU</h5>
+        <center><h5>現在までの対戦数 : {{ play_num }}</h5></center>
     </div>
     <div id="block">
         <center>

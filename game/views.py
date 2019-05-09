@@ -188,16 +188,16 @@ class GameView(View):
 
     def check_win(self, user, table):
         """勝敗の判定  userは，1がユーザー -1 がCPU"""
-        for k in range(3):  #縦に移動
-            for j in range(3):  #横に移動
-                for i in range(3):
-                    if table[5*i+j+5*k]+table[5*i+j+5*k+1]+table[5*i+j+5*k+2]==3*user:  # 横
+        for k in range(11):  #縦に移動
+            for j in range(11):  #横に移動
+                for i in range(5):
+                    if table[15*i+j+15*k]+table[15*i+j+15*k+1]+table[15*i+j+15*k+2]+table[15*i+j+15*k+3]+table[15*i+j+15*k+4]==5*user:  # 横
                         return True
-                    if table[i+j+5*k]+table[5+i+j+5*k]+table[10+i+j+5*k]==3*user:  # 縦
+                    if table[i+j+15*k]+table[15+i+j+15*k]+table[30+i+j+15*k]+table[45+i+j+15*k]+table[60+i+j+15*k]==5*user:  # 縦
                         return True
-                if table[0+j+5*k]+table[6+j+5*k]+table[12+j+5*k]==3*user:  # 斜め(左上から)
+                if table[0+j+15*k]+table[16+j+15*k]+table[32+j+15*k]+table[48+j+15*k]+table[64+j+15*k]==5*user:  # 斜め(左上から)
                     return True
-                if table[2+j+5*k]+table[6+j+5*k]+table[10+j+5*k]==3*user:  # 斜め(右上から)
+                if table[4+j+15*k]+table[18+j+15*k]+table[32+j+15*k]+table[46+j+15*k]+table[60+j+15*k]==5*user:  # 斜め(右上から)
                     return True
         return False
 
