@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Table, PlayNum, Memory, StateAction
+from .models import Table, PlayNum, Memory, StateAction, C
 from django.views.generic import TemplateView
 from .dqn_model.DQN import DQN
 
@@ -63,7 +63,7 @@ class GameView(View):
             self.params["b"+str(i)] = table[i]
         for i in range(NUM):
             if "b"+ str(i) in request.POST:
-                if not table[i] == 0:  #既に選択されているマスの場合
+                if not table[i] == 0:  # 既に選択されているマスの場合
                     self.num_to_symbol(table)
                     return render(request, "game/game15.html", self.params)
                 table[i] = 1
@@ -80,11 +80,12 @@ class GameView(View):
             self.params["result"] = "Win"
             data.tb = json.dumps(table)
             data.save()
-            self.increment_play_num()  #プレイ回数のインクリメント
-            DQNAgent.replay()  #学習
-            DQNAgent.save_model()  #モデルの保存
+            self.increment_play_num()  # プレイ回数のインクリメント
+            DQNAgent.replay()  # 学習
+            self.update_Q_Target()
+            DQNAgent.save_Q()
             self.pop_memory(state, action, new_state, lose=True)  # CPUの負け
-            self.save_memory()  #replay bufferの保存
+            self.save_memory()  # replay bufferの保存
             self.reset_state_action()
             return redirect(to="win")
 
@@ -93,11 +94,13 @@ class GameView(View):
             self.params["result"] = "Draw"
             data.tb = json.dumps(table)
             data.save()
-            self.increment_play_num()   #プレイ回数のインクリメント
-            DQNAgent.replay()  #学習
-            DQNAgent.save_model()   #モデルの保存
+            self.increment_play_num()   # プレイ回数のインクリメント
+            DQNAgent.replay()  # 学習
+            DQNAgent.save_model()   # モデルの保存
+            self.update_Q_Target()
+            DQNAgent.save_Q()
             self.pop_memory(state, action, new_state, draw=True) # 引き分け
-            self.save_memory()    #replay bufferの保存
+            self.save_memory()    # replay bufferの保存
             self.reset_state_action()
             return redirect(to="draw")
 
@@ -134,17 +137,33 @@ class GameView(View):
         """CPUの勝利(ユーザーの敗北)をチェック。勝っていれば，win=Trueで pop_memory"""
         if self.check_win(-1, table):
             self.params["result"] = "Lose"
-            self.increment_play_num()  #プレイ回数のインクリメント
-            DQNAgent.replay()  #学習
-            DQNAgent.save_model()   # モデルの保存
+            self.increment_play_num()  # プレイ回数のインクリメント
+            DQNAgent.replay()  # 学習
             self.pop_memory(state, action, new_state, win=True)   # CPUの勝利
-            self.save_memory()  #replay bufferの保存
+            self.save_memory()  # replay bufferの保存
+            self.update_Q_Target()
+            DQNAgent.save_Q()
             self.reset_state_action()
             return redirect("lose")
 
         """まだ勝敗がついていない場合"""
         self.num_to_symbol(table)
         return render(request, "game/game15.html", self.params)
+
+
+    def update_Q_Target(self):
+        c = C.objects.get(data_id=1).C -1
+        if c==0:
+            DQNAgent.update_target_Q()
+            data = C.objects.get(data_id=1)
+            data.C = 20
+            data.save()
+            DQNAgent.save_Q_Target()
+        else:
+            data = C.objects.get(data_id=1)
+            data.C = c
+            data.save()
+
 
     def increment_play_num(self):
         play_num = PlayNum.objects.get(data_id=1)

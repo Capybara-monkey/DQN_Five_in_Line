@@ -27,3 +27,7 @@ class Epsilon(models.Model):
     data_id = models.IntegerField(default=1, primary_key=True)
     eps = models.FloatField(default=1.0)
 
+
+class C(models.Model):
+    data_id = models.IntegerField(default=1, primary_key=True)
+    C = models.IntegerField(default=20)

@@ -6,7 +6,6 @@ from collections import deque
 from keras.models import Sequential, load_model
 from keras.layers import Dense
 import matplotlib.pyplot as plt
-import keras.backend as K
 import tensorflow as tf
 from ..models import Epsilon
 
@@ -27,7 +26,6 @@ class DQN():
         self.eps_min = eps_min
         self.eps_decay = (eps - eps_min) / final_expl_step
         self.mb_size = mb_size
-        self.C = C
         self.step = 0
         self.memory = deque(maxlen = self.memory_size)
         if os.path.exists("Q_network.h5"):
@@ -37,8 +35,13 @@ class DQN():
             self.Q = self._build_network()
             print("building Q-network model")
 
-        self.target_Q = self._clone_network(self.Q)
+        if os.path.exists("Q_Target_network.h5"):
+            self.target_Q = load_model("Q_Target_network.h5")
+        else:
+            self.target_Q = self._clone_network(self.Q)
+
         self.target_Q._make_predict_function()
+
 
     def set_memory(self, memory):
         self.memory = deque(maxlen = self.memory_size)
@@ -105,5 +108,14 @@ class DQN():
                     self.Q.fit(states.reshape(-1, STATE_N), Y.reshape(-1, ACTION_N))
                 print("finish training")
 
-    def save_model(self):
-        self.target_Q.save("Q_network.h5")
+    def save_Q_Target(self):
+        self.Q_target.save("Q_Target_network.h5")
+
+    def save_Q(self):
+        self.Q.save("Q_network.h5")
+
+    def update_target_Q(self):
+        global graph
+        with graph.as_default():
+            self.Q_target = self._clone_network(self.Q)
+        print("Update Q_target")
